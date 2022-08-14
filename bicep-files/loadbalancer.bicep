@@ -45,10 +45,10 @@ resource loadBalancerExternal 'Microsoft.Network/loadBalancers@2021-08-01' = {
           }
           protocol: 'Udp'
           frontendPort: 0
-          backendPort: 14159
+          backendPort: 9876
           enableFloatingIP: false
-          frontendPortRangeStart: 14159
-          frontendPortRangeEnd: 14261
+          frontendPortRangeStart: 9876
+          frontendPortRangeEnd: 9877
           backendAddressPool: {
             id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', lbName, loadBalancerBackendName)
           }
