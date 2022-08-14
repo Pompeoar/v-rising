@@ -23,6 +23,7 @@ jobs:
       memory_in_gb: 16
       volume_mount_name: saves
       load_balancer_name: lb-vrising
+      ports: 9876,9877
     
     steps:      
       - uses: actions/checkout@v3
@@ -83,7 +84,7 @@ jobs:
             cpuCores="${{ env.cpu_cores }}" \
             memoryInGb="${{ env.memory_in_gb }}" \
             volumeMountName="${{ env.volume_mount_name }}" \
-            ports=[9876, 9877] 
+            ports="${{ env.ports }}"
             
       - name: 'Deploy Load Balancer'
         uses: Azure/cli@1.0.4
