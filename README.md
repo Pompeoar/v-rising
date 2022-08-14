@@ -32,4 +32,29 @@ Github Actions need a way to authenticate to Azure. We're going to provide a ser
             "galleryEndpointUrl": "https://gallery.azure.com/",
             "managementEndpointUrl": "https://management.core.windows.net/"
         }
-    
+## Personalize
+Review the environment variables in the yaml file.  Change the names or specs of anything you rather see. 
+
+## 
+Once the storage is created, you may want to secure/personalize your server. Head to aka.ms/portal and login. Go to your storage account and update the ServerHostSettings.json to your preferred server name and password. 
+```
+{
+  "Name": "Example Server",
+  "Description": "",
+  "Port": 9876,
+  "QueryPort": 9877,
+  "MaxConnectedUsers": 40,
+  "MaxConnectedAdmins": 4,
+  "ServerFps": 30,
+  "SaveName": "world1",
+  "Password": "example_password",
+  "Secure": true,
+  "ListOnMasterServer": true,
+  "AutoSaveCount": 50,
+  "AutoSaveInterval": 600,
+  "GameSettingsPreset": "",
+  "AdminOnlyDebugEvents": true,
+  "DisableDebugEvents": false
+}
+```
+
