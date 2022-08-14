@@ -59,8 +59,8 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2021-09-01'
           }
           volumeMounts: [
             {
-              mountPath: '/config'
-              name: 'config'
+              mountPath: '/${volumeMountName}'
+              name: volumeMountName
               readOnly: false
             }
           ]
