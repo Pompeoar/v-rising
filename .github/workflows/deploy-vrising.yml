@@ -1,36 +1,99 @@
-# This is a basic workflow to help you get started with Actions
+name: Deploy V-Rising
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+jobs:  
+ bicepAzCliDeploy:
+    name: Bicep Az CLI Deploy jobs
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+  
+    env:
+      resource_group_name: rg-vrising
+      location: eastus2
+      aci_name: aci-vrising
+      vnet_name: vn-vrising
+      aci_subnet_name: sn-aci-vrising
+      public_ip_address_name: ip-vrising
+      image_name: mephi00/v-rising-wine
+      cpu_cores : 2
+      memory_in_gb: 16
+      volume_mount_name: saves
+      load_balancer_name: lb-vrising
+    
+    steps:      
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: 'Deploy Resource Group'
+        uses: Azure/cli@1.0.4
+        with:
+          inlinescript: |
+            az deployment sub create \
+            --name ${{ env.resource_group_name }} \
+            --location "${{ env.location }}" \
+            --template-file ./bicep-files/resourcegroup.bicep \
+            --parameters \
+            resourceGroupName=${{ env.resource_group_name}} \
+            location="${{ env.location }}"
+      
+      - name: 'Deploy Storage'
+        uses: Azure/cli@1.0.4
+        with:
+          inlinescript: |
+            az deployment group create \
+            --resource-group ${{ env.resource_group_name }} \
+            --template-file ./bicep-files/storage.bicep \
+            --parameters \
+            location="${{ env.location }}" \
+            volumeMountName="${{ env.volume_mount_name }}" 
+      
+      - name: 'Deploy Virtual Network'
+        uses: Azure/cli@1.0.4
+        with:
+          inlinescript: |
+            az deployment group create \
+            --resource-group ${{ env.resource_group_name }} \
+            --template-file ./bicep-files/vnet.bicep \
+            --parameters \
+            location="${{ env.location }}" \
+            vnetName="${{ env.vnet_name }}" \
+            aciSubnetName="${{ env.aci_subnet_name }}" \
+            publicIpAddressName="${{ env.public_ip_address_name }}" 
+      
+      - name: 'Deploy ACI'
+        uses: Azure/cli@1.0.4
+        with:
+          inlinescript: |
+            az deployment group create \
+            --resource-group ${{ env.resource_group_name }} \
+            --template-file ./bicep-files/aci.bicep \
+            --parameters \
+            name="${{ env.aci_name }}" \
+            location="${{ env.location }}" \
+            image="${{ env.image_name }}" \
+            vnetName="${{ env.vnet_name }}" \
+            cpuCores="${{ env.cpu_cores }}" \
+            memoryInGb="${{ env.memory_in_gb }}" \
+            volumeMountName="${{ env.volume_mount_name }}" \
+            ports=[9876, 9877] 
+            
+      - name: 'Deploy Load Balancer'
+        uses: Azure/cli@1.0.4
+        with:
+          inlinescript: |
+            az deployment group create \
+            --resource-group ${{ env.resource_group_name }} \
+            --template-file ./bicep-files/loadbalancer.bicep \
+            --parameters \
+            lbName="${{ env.load_balancer_name }}" \
+            location="${{ env.location }}" \
+            publicIpName="${{ env.public_ip_address_name }}" \
+            vnetName="${{ env.vnet_name }}" 
