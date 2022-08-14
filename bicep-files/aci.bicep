@@ -27,7 +27,7 @@ param volumeMountName string = 'saves'
 ])
 param restartPolicy string = 'Always'
 
-var storage_name = 'necesse${uniqueString(resourceGroup().id)}'
+var storage_name = 'vrising${uniqueString(resourceGroup().id)}'
 
 resource storage 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
   name: storage_name
