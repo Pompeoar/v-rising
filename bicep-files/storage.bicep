@@ -2,9 +2,9 @@ param location string = resourceGroup().location
 param volumeMountName string = 'saves'
 
 
-var storage_name = 'necesse${uniqueString(resourceGroup().id)}'
+var storage_name = 'vrising${uniqueString(resourceGroup().id)}'
 
-resource necesseStorage 'Microsoft.Storage/storageAccounts@2021-02-01' = {
+resource storage 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   name: storage_name
   location: location
   kind: 'StorageV2'
@@ -12,7 +12,7 @@ resource necesseStorage 'Microsoft.Storage/storageAccounts@2021-02-01' = {
     name: 'Standard_LRS'
   }
 
-  resource necesseFiles 'fileServices' = {
+  resource files 'fileServices' = {
     name: 'default'   
 
     resource share 'shares' = {
